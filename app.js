@@ -10,6 +10,8 @@ const passport = require("passport");
 const flash = require("connect-flash");
 var session = require("express-session");
 
+var learnerRouter = require("./routes/learner");
+
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var userRouter = require("./routes/user");
@@ -88,6 +90,8 @@ app.use(function(req, res, next) {
   res.locals.user = req.user || null;
   next();
 });
+
+app.use("/learner", learnerRouter);
 
 app.use("/users", usersRouter);
 app.use("/user", userRouter);

@@ -2,7 +2,6 @@ const ObjectId = require("mongodb").ObjectId;
 const { dbs } = require("../dbs");
 const SALT_ROUNDS = 10;
 const bcrypt = require("bcrypt");
-var mongoose = require("mongoose");
 
 module.exports.findUserByEmail = async (_email) => {
   return await dbs.production.collection("users").findOne({ email: _email });
