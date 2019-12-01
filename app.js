@@ -11,6 +11,7 @@ const flash = require("connect-flash");
 var session = require("express-session");
 
 var learnerRouter = require("./routes/learner");
+var tutorRouter = require("./routes/tutor");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -92,6 +93,7 @@ app.use(function(req, res, next) {
 });
 
 app.use("/learner", learnerRouter);
+app.use("/tutor", tutorRouter);
 
 app.use("/users", usersRouter);
 app.use("/user", userRouter);
