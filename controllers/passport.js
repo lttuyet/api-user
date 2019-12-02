@@ -3,28 +3,29 @@ const bcrypt = require("bcrypt");
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
+const learnerModel = require("../models/learners");
 const User = require("../models/user");
 
-module.exports = function(passport) {
+module.exports = function (passport) {
   passport.use(
     new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
       // Match user
 
-      User.findUserByEmail(email)
-        .then(user => {
-          if (!user) {
-            return done(null, false, { message: "Username chưa đăng ký!" });
+      learnerModel.findLearnerByEmailType(email, 'normal')
+        .then(learner => {
+          if (!learner) {
+            return done(null, false, { message: "Tài khoản không tồn tại!" });
           }
 
           // Match password
-          bcrypt.compare(password, user.password, (err, isMatch) => {
+          bcrypt.compare(password, learner.password, (err, isMatch) => {
             if (err) {
               throw err;
             }
             if (isMatch) {
-              return done(null, user);
+              return done(null, learner);
             } else {
-              return done(null, false, { message: "Mật khẩu không đúng!" });
+              return done(null, false, { message: "Sai thông tin đăng nhập!" });
             }
           });
         });
@@ -37,10 +38,10 @@ module.exports = function(passport) {
         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: "your_jwt_secret"
       },
-      function(jwtPayload, cb) {
-        return User.findUserById(jwtPayload._id)
-          .then(user => {
-            return cb(null, user);
+      function (jwtPayload, cb) {
+        return learnerModel.findLearnerById(jwtPayload._id)
+          .then(learner => {
+            return cb(null, learner);
           })
           .catch(err => {
             return cb(err);
@@ -49,13 +50,13 @@ module.exports = function(passport) {
     )
   );
 
-  passport.serializeUser(function(user, done) {
-    done(null, user._id);
+  passport.serializeUser(function (learner, done) {
+    done(null, learner._id);
   });
 
-  passport.deserializeUser(function(id, done) {
-    User.findUserById(jwtPayload._id).then( (err, user) =>{
-        done(null, user);
-      });
+  passport.deserializeUser(function (id, done) {
+    learnerModel.findLearnerById(jwtPayload._id).then((err, learner) => {
+      done(null, learner);
+    });
   });
 };

@@ -15,6 +15,12 @@ module.exports.findLearnerByIdFb = async (_idFb) => {
   });
 };
 
+module.exports.findLearnerById = async (id) => {
+  return await dbs.production.collection("learners").findOne({
+    _id: id
+  });
+};
+
 module.exports.insertLearner = async (learner, type) => {
   if (type === 'normal') {
     const hash = await bcrypt.hash(learner.password, SALT_ROUNDS);
@@ -54,3 +60,14 @@ module.exports.insertLearner = async (learner, type) => {
 
   return null;
 };
+
+module.exports.updateInfoLearner = async (learner, info) => {
+
+  return await dbs.production.collection('learners').updateOne({ _id: learner._id },
+    {
+      $set: {
+        name: info.name,
+        address: info.address
+      }
+    });
+}

@@ -56,3 +56,27 @@ exports.registerPost = async (req, res) => {
     message: "failed"
   });
 };
+
+exports.loginByFacebook = async (info) => {
+  let _idFb = await learnerModel.findLearnerByIdFb(info.idFb);
+
+  if (_idFb) {
+    await learnerModel.updateInfoLearner(_idFb, info);
+  } else {
+    await learnerModel.insertLearner(info, 'facebook');
+  }
+
+  return await learnerModel.findLearnerByIdFb(info.idFb);
+};
+
+exports.loginByGoogle = async (info) => {
+  let _email = await learnerModel.findLearnerByEmailType(info.email, 'google');
+
+  if (_email) {
+    await learnerModel.updateInfoLearner(_email, info);
+  } else {
+    await learnerModel.insertLearner(info, 'google');
+  }
+
+  return await learnerModel.findLearnerByEmailType(info.email, 'google');
+};
