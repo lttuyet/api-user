@@ -44,7 +44,6 @@ module.exports.insertUser = async (user, type) => {
     if (type === 'facebook') {
         const newUser = {
             name: user.name,
-            address: user.address,
             role: user.role,
             type: user.type,
             email: user.email,
@@ -58,7 +57,6 @@ module.exports.insertUser = async (user, type) => {
     if (type === 'google') {
         const newUser = {
             name: user.name,
-            address: user.address,
             role: user.role,
             type: user.type,
             email: user.email,
@@ -76,7 +74,6 @@ module.exports.updateInfoUser = async (user, info) => {
         {
             $set: {
                 name: info.name,
-                address: info.address,
                 image: info.image
             }
         });
