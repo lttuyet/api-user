@@ -4,30 +4,29 @@ const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const userModel = require("../models/users");
-const User = require("../models/user");
 
 module.exports = function (passport) {
   passport.use(
     new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
       // Match user
-      userModel.findUserByTypeEmail('normal',email)
-          .then(user => {
-            if (!user) {
-              return done(null, false, { message: "Tài khoản không tồn tại!" });
-            }
+      userModel.findUserByTypeEmail('normal', email)
+        .then(user => {
+          if (!user) {
+            return done(null, false, { message: "Tài khoản không tồn tại!" });
+          }
 
-            // Match password
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-              if (err) {
-                throw err;
-              }
-              if (isMatch) {
-                return done(null, user);
-              } else {
-                return done(null, false, { message: "Sai thông tin đăng nhập!" });
-              }
-            });
+          // Match password
+          bcrypt.compare(password, user.password, (err, isMatch) => {
+            if (err) {
+              throw err;
+            }
+            if (isMatch) {
+              return done(null, user);
+            } else {
+              return done(null, false, { message: "Sai thông tin đăng nhập!" });
+            }
           });
+        });
     })
   );
 

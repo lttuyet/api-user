@@ -1,8 +1,5 @@
 const userModel = require("../models/users");
 
-const User = require("../models/user");
-const bcrypt = require("bcrypt");
-
 exports.register = async (req, res) => {
   if (req.body.type === 'normal') {
     // Chỉ được sử dụng 1 email cho 1 tài khoản dù với role nào

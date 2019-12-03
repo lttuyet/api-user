@@ -16,7 +16,7 @@ module.exports.findUserByIdFb = async (_idFb) => {
     });
 };
 
-module.exports.findUserByIdGg = async ( _idGg) => {
+module.exports.findUserByIdGg = async (_idGg) => {
     return await dbs.production.collection("users").findOne({
         idGg: _idGg
     });
@@ -26,7 +26,7 @@ module.exports.findUserById = async (id) => {
     return await dbs.production.collection("users").findById(id);
 };
 
-module.exports.insertUser = async (user,type) => {
+module.exports.insertUser = async (user, type) => {
     if (type === 'normal') {
         const hash = await bcrypt.hash(user.password, SALT_ROUNDS);
         const newUser = {
@@ -49,7 +49,7 @@ module.exports.insertUser = async (user,type) => {
             type: user.type,
             email: user.email,
             idFb: user.idFb,
-            image:user.image,
+            image: user.image,
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -63,7 +63,7 @@ module.exports.insertUser = async (user,type) => {
             type: user.type,
             email: user.email,
             idGg: user.idGg,
-            image:user.image
+            image: user.image
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -73,11 +73,11 @@ module.exports.insertUser = async (user,type) => {
 module.exports.updateInfoUser = async (user, info) => {
 
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(user._id) },
-      {
-        $set: {
-          name: info.name,
-          address: info.address,
-          image:info.image
-        }
-      });
-  }
+        {
+            $set: {
+                name: info.name,
+                address: info.address,
+                image: info.image
+            }
+        });
+}
