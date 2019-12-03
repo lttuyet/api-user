@@ -3,35 +3,31 @@ const bcrypt = require("bcrypt");
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const learnerModel = require("../models/learners");
+const userModel = require("../models/users");
 const User = require("../models/user");
 
 module.exports = function (passport) {
   passport.use(
-    new LocalStrategy({ usernameField: "email" }, (email, password, type, done) => {
+    new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
       // Match user
-      console.log(email);
-
-      if (type === 'learner') {
-        learnerModel.findLearnerByEmailType(email, 'normal')
-          .then(learner => {
-            if (!learner) {
+      userModel.findUserByTypeEmail('normal',email)
+          .then(user => {
+            if (!user) {
               return done(null, false, { message: "Tài khoản không tồn tại!" });
             }
 
             // Match password
-            bcrypt.compare(password, learner.password, (err, isMatch) => {
+            bcrypt.compare(password, user.password, (err, isMatch) => {
               if (err) {
                 throw err;
               }
               if (isMatch) {
-                return done(null, learner);
+                return done(null, user);
               } else {
                 return done(null, false, { message: "Sai thông tin đăng nhập!" });
               }
             });
           });
-      }
     })
   );
 
@@ -42,9 +38,9 @@ module.exports = function (passport) {
         secretOrKey: "your_jwt_secret"
       },
       function (jwtPayload, cb) {
-        return learnerModel.findLearnerById(jwtPayload._id)
-          .then(learner => {
-            return cb(null, learner);
+        return userModel.findUserById(jwtPayload._id)
+          .then(user => {
+            return cb(null, user);
           })
           .catch(err => {
             return cb(err);
@@ -58,8 +54,8 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser(function (id, done) {
-    learnerModel.findLearnerById(jwtPayload._id).then((err, learner) => {
-      done(null, learner);
+    learnerModel.findUserById(jwtPayload._id).then((err, user) => {
+      done(null, user);
     });
   });
 };

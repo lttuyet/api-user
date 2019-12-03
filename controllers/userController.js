@@ -60,3 +60,27 @@ exports.register = async (req, res) => {
     message: "failed"
   });
 };
+
+exports.loginByFacebook = async (info) => {
+  let _idFb = await userModel.findUserByIdFb(info.idFb);
+
+  if (_idFb) {
+    await userModel.updateInfoUser(_idFb, info);
+  } else {
+    await userModel.insertUser(info, 'facebook');
+  }
+
+  return await userModel.findUserByIdFb(info.idFb);
+};
+
+exports.loginByGoogle = async (info) => {
+  let _email = await userModel.findUserByIdGg(info.idGg);
+
+  if (_email) {
+    await userModel.updateInfoUser(_email, info);
+  } else {
+    await userModel.insertUser(info, 'google');
+  }
+
+  return await userModel.findUserByIdGg(info.idGg);
+};
