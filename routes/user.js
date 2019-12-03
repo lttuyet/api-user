@@ -42,7 +42,8 @@ router.post('/login', async (req, res, next) => {
         const token = jwt.sign(user, 'your_jwt_secret');
 
         return res.json({
-            token
+            token,
+            role:user.role
         });
     }
 
@@ -52,7 +53,8 @@ router.post('/login', async (req, res, next) => {
         const token = jwt.sign(user, 'your_jwt_secret');
 
         return res.json({
-            token
+            token,
+            role:user.role
         });
     }
 });
