@@ -11,10 +11,10 @@ router.get("/me", function(req, res, next) {
   });
 });
 
-router.post("/updateaccount", userController.updateAccount);
+/*router.post("/updateaccount", userController.updateAccount);
 
 router.post("/updatepicture", userController.updatePicture);
 
-router.post("/changepassword", userController.changePassword);
+router.post("/changepassword", userController.changePassword);*/
 
 module.exports = router;

@@ -8,27 +8,30 @@ const User = require("../models/user");
 
 module.exports = function (passport) {
   passport.use(
-    new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
+    new LocalStrategy({ usernameField: "email" }, (email, password, type, done) => {
       // Match user
+      console.log(email);
 
-      learnerModel.findLearnerByEmailType(email, 'normal')
-        .then(learner => {
-          if (!learner) {
-            return done(null, false, { message: "Tài khoản không tồn tại!" });
-          }
+      if (type === 'learner') {
+        learnerModel.findLearnerByEmailType(email, 'normal')
+          .then(learner => {
+            if (!learner) {
+              return done(null, false, { message: "Tài khoản không tồn tại!" });
+            }
 
-          // Match password
-          bcrypt.compare(password, learner.password, (err, isMatch) => {
-            if (err) {
-              throw err;
-            }
-            if (isMatch) {
-              return done(null, learner);
-            } else {
-              return done(null, false, { message: "Sai thông tin đăng nhập!" });
-            }
+            // Match password
+            bcrypt.compare(password, learner.password, (err, isMatch) => {
+              if (err) {
+                throw err;
+              }
+              if (isMatch) {
+                return done(null, learner);
+              } else {
+                return done(null, false, { message: "Sai thông tin đăng nhập!" });
+              }
+            });
           });
-        });
+      }
     })
   );
 
@@ -50,8 +53,8 @@ module.exports = function (passport) {
     )
   );
 
-  passport.serializeUser(function (learner, done) {
-    done(null, learner._id);
+  passport.serializeUser(function (user, done) {
+    done(null, user._id);
   });
 
   passport.deserializeUser(function (id, done) {
