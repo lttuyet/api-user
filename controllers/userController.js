@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
   }
 
   if (req.body.type === 'google') {
-    const existedUsers = await userModel.findUserByTypeEmail('google',req.body.email);
+    const existedUsers = await userModel.findUserByIdGg(req.body.idGg);
 
     if (existedUsers) {
       return res.json({
