@@ -39,23 +39,37 @@ router.post('/login', async (req, res, next) => {
     if (req.body.type === 'facebook') {
         const user = await userController.loginByFacebook(req.body);
 
-        const token = jwt.sign(user, 'your_jwt_secret');
+        if (user) {
+            const token = jwt.sign(user, 'your_jwt_secret');
+
+            return res.json({
+                token,
+                role: user.role
+            });
+        }
 
         return res.json({
-            token,
-            role:user.role
-        });
+            status: 501,
+            message: "Tài khoản không tồn tại!"
+          });
     }
 
     if (req.params.type === 'google') {
         const user = await userController.loginByGoogle(req.body);
 
-        const token = jwt.sign(user, 'your_jwt_secret');
+        if (user) {
+            const token = jwt.sign(user, 'your_jwt_secret');
+
+            return res.json({
+                token,
+                role: user.role
+            });
+        }
 
         return res.json({
-            token,
-            role:user.role
-        });
+            status: 501,
+            message: "Tài khoản không tồn tại!"
+          });
     }
 });
 

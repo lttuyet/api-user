@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
   }
 
   if (req.body.type === 'google') {
-    const existedUsers = await userModel.findUserByIdGg(req.body.idGg);
+    const existedUsers = await userModel.findUserByTypeEmail('google',req.body.email);
 
     if (existedUsers) {
       return res.json({
@@ -62,12 +62,12 @@ exports.loginByFacebook = async (info) => {
   let _idFb = await userModel.findUserByIdFb(info.idFb);
 
   if (_idFb) {
-    await userModel.updateInfoUser(_idFb, info);
-  } else {
-    await userModel.insertUser(info, 'facebook');
+    await userModel.updateInfoUser(_email, info);
+
+    return true;
   }
 
-  return await userModel.findUserByIdFb(info.idFb);
+  return false;
 };
 
 exports.loginByGoogle = async (info) => {
@@ -75,9 +75,9 @@ exports.loginByGoogle = async (info) => {
 
   if (_email) {
     await userModel.updateInfoUser(_email, info);
-  } else {
-    await userModel.insertUser(info, 'google');
+
+    return true;
   }
 
-  return await userModel.findUserByIdGg(info.idGg);
+  return false;
 };
