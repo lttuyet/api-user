@@ -54,7 +54,11 @@ router.post('/login', async (req, res, next) => {
           });
     }
 
-    if (req.params.type === 'google') {
+    if (req.body.type === 'google') {
+        console.log("11111111111111111111111111111");
+
+        console.log(req.body);
+
         const user = await userController.loginByGoogle(req.body);
 
         if (user) {

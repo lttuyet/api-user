@@ -38,6 +38,7 @@ exports.register = async (req, res) => {
 
   if (req.body.type === 'google') {
     const existedUsers = await userModel.findUserByIdGg(req.body.idGg);
+    console.log(existedUsers);
 
     if (existedUsers) {
       return res.json({
@@ -62,7 +63,7 @@ exports.loginByFacebook = async (info) => {
   let _idFb = await userModel.findUserByIdFb(info.idFb);
 
   if (_idFb) {
-    await userModel.updateInfoUser(_email, info);
+    await userModel.updateInfoUser(_idFb, info);
 
     return true;
   }
