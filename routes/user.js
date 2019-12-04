@@ -51,14 +51,10 @@ router.post('/login', async (req, res, next) => {
         return res.json({
             status: 501,
             message: "Tài khoản không tồn tại!"
-          });
+        });
     }
 
     if (req.body.type === 'google') {
-        console.log("11111111111111111111111111111");
-
-        console.log(req.body);
-
         const user = await userController.loginByGoogle(req.body);
 
         if (user) {
@@ -73,7 +69,7 @@ router.post('/login', async (req, res, next) => {
         return res.json({
             status: 501,
             message: "Tài khoản không tồn tại!"
-          });
+        });
     }
 });
 

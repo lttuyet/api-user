@@ -38,7 +38,6 @@ exports.register = async (req, res) => {
 
   if (req.body.type === 'google') {
     const existedUsers = await userModel.findUserByIdGg(req.body.idGg);
-    console.log(existedUsers);
 
     if (existedUsers) {
       return res.json({
