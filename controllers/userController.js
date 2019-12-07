@@ -64,7 +64,7 @@ exports.loginByFacebook = async (info) => {
   if (_idFb) {
     await userModel.updateInfoUser(_idFb, info);
 
-    return true;
+    return await userModel.findUserByIdFb(info.idFb);
   }
 
   return false;
@@ -76,7 +76,7 @@ exports.loginByGoogle = async (info) => {
   if (_email) {
     await userModel.updateInfoUser(_email, info);
 
-    return true;
+    return await userModel.findUserByIdGg(info.idGg);
   }
 
   return false;

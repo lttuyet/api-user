@@ -38,7 +38,7 @@ router.post('/login', async (req, res, next) => {
 
     if (req.body.type === 'facebook') {
         const user = await userController.loginByFacebook(req.body);
-
+        
         if (user) {
             const token = jwt.sign(user, 'your_jwt_secret');
 
