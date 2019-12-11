@@ -53,7 +53,7 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser(function (id, done) {
-    learnerModel.findUserById(jwtPayload._id).then((err, user) => {
+    userModel.findUserById(jwtPayload._id).then((err, user) => {
       done(null, user);
     });
   });

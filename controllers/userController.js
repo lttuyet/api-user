@@ -1,6 +1,6 @@
 const userModel = require("../models/users");
 
-exports.register = async (req, res) => {
+exports.register = async (req, res) => { 
   if (req.body.type === 'normal') {
     // Chỉ được sử dụng 1 email cho 1 tài khoản dù với role nào
     const existedUsers = await userModel.findUserByTypeEmail(req.body.type, req.body.email);
@@ -80,4 +80,21 @@ exports.loginByGoogle = async (info) => {
   }
 
   return false;
+};
+
+exports.updateBasic = async (req, res) => {
+  let result = await userModel.updateBasicByEmail(req.body.email, req.body);
+
+  console.log(result);
+
+  if (result) {
+    return res.json({
+      message: "success"
+    });
+  }
+
+  return res.json({
+    status: 502,
+    message: "failed update"
+  });
 };

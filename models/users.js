@@ -6,24 +6,27 @@ const ObjectId = require('mongodb').ObjectId;
 module.exports.findUserByTypeEmail = async (_type, _email) => {
     return await dbs.production.collection("users").findOne({
         type: _type,
-        email: _email
+        email: _email,
+        isDeleted:false
     });
 };
 
 module.exports.findUserByIdFb = async (_idFb) => {
     return await dbs.production.collection("users").findOne({
-        idFb: _idFb
+        idFb: _idFb,
+        isDeleted:false
     });
 };
 
 module.exports.findUserByIdGg = async (_idGg) => {
     return await dbs.production.collection("users").findOne({
-        idGg: _idGg
+        idGg: _idGg,
+        isDeleted:false
     });
 };
 
 module.exports.findUserById = async (id) => {
-    return await dbs.production.collection("users").findById(id);
+    return await dbs.production.collection("users").findOne({_id:ObjectId(id)});
 };
 
 module.exports.insertUser = async (user, type) => {
@@ -35,7 +38,8 @@ module.exports.insertUser = async (user, type) => {
             role: user.role,
             type: user.type,
             email: user.email,
-            password: hash
+            password: hash,
+            isDeleted:false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -49,6 +53,7 @@ module.exports.insertUser = async (user, type) => {
             email: user.email,
             idFb: user.idFb,
             image: user.image,
+            isDeleted:false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -61,7 +66,8 @@ module.exports.insertUser = async (user, type) => {
             type: user.type,
             email: user.email,
             idGg: user.idGg,
-            image: user.image
+            image: user.image,
+            isDeleted:false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -75,6 +81,17 @@ module.exports.updateInfoUser = async (user, info) => {
             $set: {
                 name: info.name,
                 image: info.image
+            }
+        });
+}
+
+module.exports.updateBasicByEmail = async (_email,info) => {
+
+    return await dbs.production.collection('users').updateOne({ email: _email },
+        {
+            $set: {
+                name: info.name,
+                address: info.address
             }
         });
 }
