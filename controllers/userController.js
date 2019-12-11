@@ -100,26 +100,47 @@ exports.getDetailsTutor = async (req, res) => {
   });
 };
 
+exports.getDetails = async (req, res) => {
+  try {
+      const _user = req.user;
 
+      if (_user.role === 'tutor') {
+          const _tags = await userTagModel.findByUser(_user._id);
 
+          if (!_tags) {
+              return res.json({
+                  status: 507,
+                  message: "get details user failed"
+              });
+          }
 
+          return res.json({
+              user: _user,
+              tags: _tags
+          });
+      } else {
+          if (!_user) {
+              return res.json({
+                  status: 507,
+                  message: "get details user failed"
+              });
+          }
 
+          return res.json({
+              user: _user
+          });
+      }
 
-
-
-
-
-
-
-
-
-
-
+  } catch (e) {
+      return res.json({
+          status: 507,
+          message: "get details user failed"
+      });
+  }
+};
 
 exports.updateBasic = async (req, res) => {
-  let result = await userModel.updateBasicByEmail(req.body.email, req.body);
-
-  console.log(result);
+  const result = await userModel.updateBasic(req.user._id,req.body);
 
   if (result) {
     return res.json({
@@ -128,7 +149,24 @@ exports.updateBasic = async (req, res) => {
   }
 
   return res.json({
-    status: 502,
-    message: "failed update"
+    status: 509,
+    message: "update basic info user failed"
   });
 };
+
+/* exports.getListTutors = async (req, res) => {
+  const _tutors = await userModel.findTutorsConditions(req.params.arrange,req.params.address,req.params.price,req.params.tag);
+
+  if (!_tutor||!_tags) {
+    return res.json({
+      status: 508,
+      message: "not found tutor"
+    });
+  }
+
+  return res.json({
+    tutor:_tutor,
+    tags:_tags
+  });
+};
+*/

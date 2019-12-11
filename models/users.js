@@ -93,20 +93,13 @@ module.exports.getDetails = async (id) => {
     }
 };
 
+module.exports.updateBasic = async (id,data) => {
 
-
-
-
-
-
-
-module.exports.updateBasicByEmail = async (_email,info) => {
-
-    return await dbs.production.collection('users').updateOne({ email: _email },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id) },
         {
             $set: {
-                name: info.name,
-                address: info.address
+                name: data.name,
+                address: data.address
             }
         });
 }
