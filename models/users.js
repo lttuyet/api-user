@@ -85,6 +85,21 @@ module.exports.updateInfoUser = async (user, info) => {
         });
 }
 
+module.exports.getDetails = async (id) => {
+    try{
+        return  await dbs.production.collection('users').findOne({_id:ObjectId(id)});
+    }catch(e){
+        return false;
+    }
+};
+
+
+
+
+
+
+
+
 module.exports.updateBasicByEmail = async (_email,info) => {
 
     return await dbs.production.collection('users').updateOne({ email: _email },

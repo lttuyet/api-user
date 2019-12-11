@@ -1,4 +1,5 @@
 const userModel = require("../models/users");
+const userTagModel = require("../models/user_tag");
 
 exports.register = async (req, res) => { 
   if (req.body.type === 'normal') {
@@ -81,6 +82,39 @@ exports.loginByGoogle = async (info) => {
 
   return false;
 };
+
+exports.getDetailsTutor = async (req, res) => {
+  const _tutor = await userModel.getDetails(req.body.id);
+  const _tags=await userTagModel.findByUser(req.body.id);
+
+  if (!_tutor||!_tags) {
+    return res.json({
+      status: 508,
+      message: "not found tutor"
+    });
+  }
+
+  return res.json({
+    tutor:_tutor,
+    tags:_tags
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 exports.updateBasic = async (req, res) => {
   let result = await userModel.updateBasicByEmail(req.body.email, req.body);

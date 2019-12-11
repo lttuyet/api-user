@@ -73,4 +73,7 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
+router.get("/detailstutor", userController.getDetailsTutor);
+  
+
 module.exports = router;
