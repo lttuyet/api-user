@@ -154,6 +154,39 @@ exports.updateBasic = async (req, res) => {
   });
 };
 
+exports.updateImage = async (req, res) => {
+  const result = await userModel.updateImage(req.user._id,req.body.image);
+
+  if (result) {
+    return res.json({
+      message: "success"
+    });
+  }
+
+  return res.json({
+    status: 510,
+    message: "update image failed"
+  });
+};
+
+exports.getTypicalTutors = async (req, res) => {
+  const result = await userModel.getTypicalTutors();
+
+  if (result) {
+    return res.json({
+      tutors:result
+    });
+  }
+
+  return res.json({
+    status: "failed",
+    message: "get typical details failed"
+  });
+};
+
+
+
+
 /* exports.getListTutors = async (req, res) => {
   const _tutors = await userModel.findTutorsConditions(req.params.arrange,req.params.address,req.params.price,req.params.tag);
 

@@ -6,27 +6,27 @@ const ObjectId = require('mongodb').ObjectId;
 module.exports.findUserByTypeEmail = async (_type, _email) => {
     return await dbs.production.collection("users").findOne({
         type: _type,
-        email: _email,
-        isDeleted:false
+        email: _email.toLowerCase(),
+        isDeleted: false
     });
 };
 
 module.exports.findUserByIdFb = async (_idFb) => {
     return await dbs.production.collection("users").findOne({
         idFb: _idFb,
-        isDeleted:false
+        isDeleted: false
     });
 };
 
 module.exports.findUserByIdGg = async (_idGg) => {
     return await dbs.production.collection("users").findOne({
         idGg: _idGg,
-        isDeleted:false
+        isDeleted: false
     });
 };
 
 module.exports.findUserById = async (id) => {
-    return await dbs.production.collection("users").findOne({_id:ObjectId(id)});
+    return await dbs.production.collection("users").findOne({ _id: ObjectId(id) });
 };
 
 module.exports.insertUser = async (user, type) => {
@@ -37,9 +37,9 @@ module.exports.insertUser = async (user, type) => {
             address: user.address,
             role: user.role,
             type: user.type,
-            email: user.email,
+            email: user.email.toLowerCase(),
             password: hash,
-            isDeleted:false
+            isDeleted: false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -53,7 +53,7 @@ module.exports.insertUser = async (user, type) => {
             email: user.email,
             idFb: user.idFb,
             image: user.image,
-            isDeleted:false
+            isDeleted: false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -67,7 +67,7 @@ module.exports.insertUser = async (user, type) => {
             email: user.email,
             idGg: user.idGg,
             image: user.image,
-            isDeleted:false
+            isDeleted: false
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -86,15 +86,14 @@ module.exports.updateInfoUser = async (user, info) => {
 }
 
 module.exports.getDetails = async (id) => {
-    try{
-        return  await dbs.production.collection('users').findOne({_id:ObjectId(id)});
-    }catch(e){
+    try {
+        return await dbs.production.collection('users').findOne({ _id: ObjectId(id) });
+    } catch (e) {
         return false;
     }
 };
 
-module.exports.updateBasic = async (id,data) => {
-
+module.exports.updateBasic = async (id, data) => {
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(id) },
         {
             $set: {
@@ -102,4 +101,75 @@ module.exports.updateBasic = async (id,data) => {
                 address: data.address
             }
         });
+}
+
+module.exports.updateImage = async (id, _image) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id) },
+        {
+            $set: {
+                image: _image
+            }
+        });
+}
+
+module.exports.getTypicalTutors = async () => {
+    // match dùng để lọc dữ liệu theo các trường
+    const typicalTutors = await dbs.production.collection('users').aggregate([
+        { $match: { role: "tutor", isDeleted: false } },
+        {
+            $lookup: {
+                from: 'contracts',
+                localField: '_id',
+                foreignField: 'tutor',
+                as: 'tutor_contracts'
+            }
+        },
+        {
+            $project:{
+                    _id:"$_id",
+                    name:"$name",
+                    image:"$image",
+                    intro:"$intro",
+                    price:"$price",
+                    address:"$address",
+                    numOfContracts:{$size:"$tutor_contracts"}
+                }
+        },
+        {
+            $sort:{numOfContracts:-1}
+        },
+        {
+            $limit:3
+        },
+        {
+            $lookup: {
+                from: 'user_tag',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'tutorTag'
+            }
+        },
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'tutorTag.tag',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        },
+        {
+            $project:{
+                    _id:"$_id",
+                    name:"$name",
+                    image:"$image",
+                    intro:"$intro",
+                    price:"$price",
+                    address:"$address",
+                    numOfContracts:"$numOfContracts",
+                    tags:"$tags.name"
+                }
+        }
+    ]).toArray();
+    
+    return typicalTutors;
 }
