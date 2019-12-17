@@ -184,22 +184,17 @@ exports.getTypicalTutors = async (req, res) => {
   });
 };
 
+exports.getListTutors = async (req, res) => {
+  const _tutors = await userModel.findTutors(req.body);
 
-
-
-/* exports.getListTutors = async (req, res) => {
-  const _tutors = await userModel.findTutorsConditions(req.params.arrange,req.params.address,req.params.price,req.params.tag);
-
-  if (!_tutor||!_tags) {
+  if (!_tutors) {
     return res.json({
-      status: 508,
-      message: "not found tutor"
+      status: "failed",
+      message: "get list tutors failed"
     });
   }
 
   return res.json({
-    tutor:_tutor,
-    tags:_tags
+    tutors:_tutors
   });
 };
-*/

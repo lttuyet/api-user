@@ -75,9 +75,11 @@ router.post('/login', async (req, res, next) => {
 
 router.get("/typicaltutors", userController.getTypicalTutors);
 
+router.post("/listtutors", userController.getListTutors);
+
+
 
 router.get("/detailstutor", userController.getDetailsTutor);
 
-//router.get("/listtutors", userController.getListTutors);
 
 module.exports = router;
