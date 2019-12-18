@@ -125,21 +125,21 @@ module.exports.getTypicalTutors = async () => {
             }
         },
         {
-            $project:{
-                    _id:"$_id",
-                    name:"$name",
-                    image:"$image",
-                    intro:"$intro",
-                    price:"$price",
-                    address:"$address",
-                    numOfContracts:{$size:"$tutor_contracts"}
-                }
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: { $size: "$tutor_contracts" }
+            }
         },
         {
-            $sort:{numOfContracts:-1}
+            $sort: { numOfContracts: -1 }
         },
         {
-            $limit:3
+            $limit: 3
         },
         {
             $lookup: {
@@ -158,25 +158,24 @@ module.exports.getTypicalTutors = async () => {
             }
         },
         {
-            $project:{
-                    _id:"$_id",
-                    name:"$name",
-                    image:"$image",
-                    intro:"$intro",
-                    price:"$price",
-                    address:"$address",
-                    numOfContracts:"$numOfContracts",
-                    tags:"$tags.name"
-                }
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: "$numOfContracts",
+                tags: "$tags.name"
+            }
         }
     ]).toArray();
-    
+
     return typicalTutors;
 }
 
-module.exports.findTutors= async (req) => {
-    const n=parseInt(req.page*9); //Bỏ qua skip tutors
-    const tutors = await dbs.production.collection('users').aggregate([ 
+module.exports.getListTutors = async () => {
+    const tutors = await dbs.production.collection('users').aggregate([
         { $match: { role: "tutor", isDeleted: false } }, // match dùng để lọc dữ liệu theo các trường
         {
             $lookup: {
@@ -187,22 +186,19 @@ module.exports.findTutors= async (req) => {
             }
         }, // Lấy danh sách hợp đồng
         {
-            $project:{
-                    _id:"$_id",
-                    name:"$name",
-                    image:"$image",
-                    intro:"$intro",
-                    price:"$price",
-                    address:"$address",
-                    numOfContracts:{$size:"$tutor_contracts"}
-                }
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: { $size: "$tutor_contracts" }
+            }
         }, // Tính số hợp đồng
         {
-            $sort:{numOfContracts:-1}
-        }, // Sắp xếp theo phổ biến
-        {
-            $skip:n
-        }, // bỏ qua skip tutors
+            $sort: { numOfContracts: -1 }
+        }, // Sắp xếp theo phổ biến // bỏ qua skip tutors
         {
             $lookup: {
                 from: 'user_tag',
@@ -220,18 +216,18 @@ module.exports.findTutors= async (req) => {
             }
         }, // Lấy danh sách tags
         {
-            $project:{
-                    _id:"$_id",
-                    name:"$name",
-                    image:"$image",
-                    intro:"$intro",
-                    price:"$price",
-                    address:"$address",
-                    numOfContracts:"$numOfContracts",
-                    tags:"$tags.name"
-                }
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: "$numOfContracts",
+                tags: "$tags.name"
+            }
         } // Chọn trường
     ]).toArray();
-    
+
     return tutors;
 }

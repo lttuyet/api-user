@@ -1,7 +1,7 @@
 const userModel = require("../models/users");
 const userTagModel = require("../models/user_tag");
 
-exports.register = async (req, res) => { 
+exports.register = async (req, res) => {
   if (req.body.type === 'normal') {
     // Chỉ được sử dụng 1 email cho 1 tài khoản dù với role nào
     const existedUsers = await userModel.findUserByTypeEmail(req.body.type, req.body.email);
@@ -85,9 +85,9 @@ exports.loginByGoogle = async (info) => {
 
 exports.getDetailsTutor = async (req, res) => {
   const _tutor = await userModel.getDetails(req.body.id);
-  const _tags=await userTagModel.findByUser(req.body.id);
+  const _tags = await userTagModel.findByUser(req.body.id);
 
-  if (!_tutor||!_tags) {
+  if (!_tutor || !_tags) {
     return res.json({
       status: 508,
       message: "not found tutor"
@@ -95,52 +95,52 @@ exports.getDetailsTutor = async (req, res) => {
   }
 
   return res.json({
-    tutor:_tutor,
-    tags:_tags
+    tutor: _tutor,
+    tags: _tags
   });
 };
 
 exports.getDetails = async (req, res) => {
   try {
-      const _user = req.user;
+    const _user = req.user;
 
-      if (_user.role === 'tutor') {
-          const _tags = await userTagModel.findByUser(_user._id);
+    if (_user.role === 'tutor') {
+      const _tags = await userTagModel.findByUser(_user._id);
 
-          if (!_tags) {
-              return res.json({
-                  status: 507,
-                  message: "get details user failed"
-              });
-          }
-
-          return res.json({
-              user: _user,
-              tags: _tags
-          });
-      } else {
-          if (!_user) {
-              return res.json({
-                  status: 507,
-                  message: "get details user failed"
-              });
-          }
-
-          return res.json({
-              user: _user
-          });
-      }
-
-  } catch (e) {
-      return res.json({
+      if (!_tags) {
+        return res.json({
           status: 507,
           message: "get details user failed"
+        });
+      }
+
+      return res.json({
+        user: _user,
+        tags: _tags
       });
+    } else {
+      if (!_user) {
+        return res.json({
+          status: 507,
+          message: "get details user failed"
+        });
+      }
+
+      return res.json({
+        user: _user
+      });
+    }
+
+  } catch (e) {
+    return res.json({
+      status: 507,
+      message: "get details user failed"
+    });
   }
 };
 
 exports.updateBasic = async (req, res) => {
-  const result = await userModel.updateBasic(req.user._id,req.body);
+  const result = await userModel.updateBasic(req.user._id, req.body);
 
   if (result) {
     return res.json({
@@ -155,7 +155,7 @@ exports.updateBasic = async (req, res) => {
 };
 
 exports.updateImage = async (req, res) => {
-  const result = await userModel.updateImage(req.user._id,req.body.image);
+  const result = await userModel.updateImage(req.user._id, req.body.image);
 
   if (result) {
     return res.json({
@@ -174,7 +174,7 @@ exports.getTypicalTutors = async (req, res) => {
 
   if (result) {
     return res.json({
-      tutors:result
+      tutors: result
     });
   }
 
@@ -185,7 +185,7 @@ exports.getTypicalTutors = async (req, res) => {
 };
 
 exports.getListTutors = async (req, res) => {
-  const _tutors = await userModel.findTutors(req.body);
+  const _tutors = await userModel.getListTutors();
 
   if (!_tutors) {
     return res.json({
@@ -195,6 +195,6 @@ exports.getListTutors = async (req, res) => {
   }
 
   return res.json({
-    tutors:_tutors
+    tutors: _tutors
   });
 };

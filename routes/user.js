@@ -1,9 +1,11 @@
 var express = require("express");
 const jwt = require("jsonwebtoken");
 var router = express.Router();
-var userController = require("../controllers/userController"); 
+var userController = require("../controllers/userController");
+var tagController = require("../controllers/tagControllers");
 const passport = require('passport');
 
+// ------------------Chưa đăng nhập------------------------
 router.post("/register", userController.register);
 
 router.post('/login', async (req, res, next) => {
@@ -38,7 +40,7 @@ router.post('/login', async (req, res, next) => {
 
     if (req.body.type === 'facebook') {
         const user = await userController.loginByFacebook(req.body);
-        
+
         if (user) {
             const token = jwt.sign(user, 'your_jwt_secret');
 
@@ -75,8 +77,9 @@ router.post('/login', async (req, res, next) => {
 
 router.get("/typicaltutors", userController.getTypicalTutors);
 
-router.post("/listtutors", userController.getListTutors);
+router.get("/listtutors", userController.getListTutors);
 
+router.get("/listtags", tagController.getAll);
 
 
 router.get("/detailstutor", userController.getDetailsTutor);
