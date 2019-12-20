@@ -1,5 +1,6 @@
 const userModel = require("../models/users");
 const userTagModel = require("../models/user_tag");
+const contractModel = require("../models/contracts");
 
 exports.register = async (req, res) => {
   if (req.body.type === 'normal') {
@@ -197,4 +198,40 @@ exports.getListTutors = async (req, res) => {
   return res.json({
     tutors: _tutors
   });
+};
+
+exports.getDetailsTutor = async (req, res) => {
+  try {
+    const _tutor = await userModel.getDetails(req.body.id);
+
+    if (!_tutor) {
+      return res.json({
+        status: "failed",
+        message: "get detailed tutor failed"
+      });
+    }
+
+    const tutor = {
+      _id:_tutor._id,
+      name: _tutor.name,
+      image: _tutor.image,
+      address: _tutor.address,
+      intro: _tutor.intro,
+      price: _tutor.price,
+    };
+    const _tags = await userTagModel.findByUser(req.body.id);
+    const _contracts = await contractModel.findByTutor(req.body.id);
+
+    return res.json({
+      status: "success",
+      tutor: tutor,
+      tags: _tags,
+      contracts: _contracts
+    });
+} catch (e) {
+  return res.json({
+    status: "failed",
+    message: "get details tutor failed"
+  });
+}
 };

@@ -81,8 +81,6 @@ router.get("/listtutors", userController.getListTutors);
 
 router.get("/listtags", tagController.getAll);
 
-
-router.get("/detailstutor", userController.getDetailsTutor);
-
+router.post("/detailstutor", userController.getDetailsTutor);
 
 module.exports = router;

@@ -231,3 +231,9 @@ module.exports.getListTutors = async () => {
 
     return tutors;
 }
+
+module.exports.getDetailsTutor = async (id) => {
+    const tutor = await dbs.production.collection('users').findOne({ _id: ObjectId(id), role: "tutor", isDeleted: false });
+
+    return tutor;
+}
