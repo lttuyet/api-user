@@ -15,6 +15,10 @@ module.exports = function (passport) {
             return done(null, false, { message: "Tài khoản không tồn tại!" });
           }
 
+          if (user.isblocked) {
+            return done(null, false, { message: "Tài khoản đã bị khóa!" });
+          }
+
           // Match password
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) {

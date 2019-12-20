@@ -11,10 +11,26 @@ router.post("/register", userController.register);
 router.post('/login', async (req, res, next) => {
     if (req.body.type === 'normal') {
         passport.authenticate('local', { session: false }, (err, user, info) => {
+            if (info) {
+                if (info.message === "Tài khoản đã bị khóa!") {
+                    return res.json({
+                        status: "failed",
+                        message: "Tài khoản đã bị khóa!"
+                    });
+                }
+
+                if (info.message === "Tài khoản không tồn tại!") {
+                    return res.json({
+                        status: "failed",
+                        message: "Tài khoản không tồn tại!"
+                    });
+                }
+            }
+
             if (err || !user) {
                 return res.json({
-                    status: 501,
-                    message: 'failed login'
+                    status: "failed",
+                    message: "Lỗi kết nối"
                 });
             }
 
@@ -31,6 +47,7 @@ router.post('/login', async (req, res, next) => {
                     role: user.role
                 }
                 return res.json({
+                    status: "success",
                     data,
                     token
                 });
@@ -45,13 +62,14 @@ router.post('/login', async (req, res, next) => {
             const token = jwt.sign(user, 'your_jwt_secret');
 
             return res.json({
+                status: "success",
                 token,
                 role: user.role
             });
         }
 
         return res.json({
-            status: 501,
+            status: "failed",
             message: "Tài khoản không tồn tại!"
         });
     }
@@ -63,13 +81,14 @@ router.post('/login', async (req, res, next) => {
             const token = jwt.sign(user, 'your_jwt_secret');
 
             return res.json({
+                status: "success",
                 token,
                 role: user.role
             });
         }
 
         return res.json({
-            status: 501,
+            status: "failed",
             message: "Tài khoản không tồn tại!"
         });
     }
