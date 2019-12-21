@@ -125,26 +125,25 @@ module.exports.getListTutors = async () => {
 }
 
 module.exports.findUserByTypeEmail = async (_type, _email) => {
-    try {
-        return await dbs.production.collection("users").findOne({
-            type: _type,
-            email: _email.toLowerCase(),
-            isDeleted: false
-        });
-    } catch (e) {
-        return false;
-    }
+    return await dbs.production.collection("users").findOne({
+        type: _type,
+        email: _email.toLowerCase(),
+        isDeleted: false
+    });
 };
 
 module.exports.findUserByIdFb = async (_idFb) => {
-    try {
-        return await dbs.production.collection("users").findOne({
-            idFb: _idFb,
-            isDeleted: false
-        });
-    } catch (e) {
-        return false;
-    }
+    return await dbs.production.collection("users").findOne({
+        idFb: _idFb,
+        isDeleted: false
+    });
+};
+
+module.exports.findUserByIdGg = async (_idGg) => {
+    return await dbs.production.collection("users").findOne({
+        idGg: _idGg,
+        isDeleted: false
+    });
 };
 
 module.exports.insertUser = async (user, type, secretToken) => {
@@ -160,7 +159,7 @@ module.exports.insertUser = async (user, type, secretToken) => {
             isDeleted: false,
             isblocked: false,
             isActivated: false,
-            veryfyCode: secretToken
+            verifyCode: secretToken
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -177,7 +176,7 @@ module.exports.insertUser = async (user, type, secretToken) => {
             isDeleted: false,
             isblocked: false,
             isActivated: false,
-            veryfyCode: ""
+            verifyCode: ""
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -194,14 +193,31 @@ module.exports.insertUser = async (user, type, secretToken) => {
             isDeleted: false,
             isblocked: false,
             isActivated: false,
-            veryfyCode: ""
+            verifyCode: ""
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
     }
 };
 
+module.exports.findUserById = async (id) => {
+    return await dbs.production.collection("users").findOne({ _id: ObjectId(id), isDeleted: false });
+};
 
+
+
+
+module.exports.activatedCode = async (data) => {
+    try {
+        const user = await dbs.production.collection("users").findOne({ _id: ObjectId(data.id) });
+
+        if (user.verifyCode === data.code) {
+            //const res
+        }
+    } catch (e) {
+        return false;
+    }
+};
 
 
 
@@ -223,16 +239,9 @@ module.exports.findUserByEmail = async (_email) => {
 
 
 
-module.exports.findUserByIdGg = async (_idGg) => {
-    return await dbs.production.collection("users").findOne({
-        idGg: _idGg,
-        isDeleted: false
-    });
-};
 
-module.exports.findUserById = async (id) => {
-    return await dbs.production.collection("users").findOne({ _id: ObjectId(id), isDeleted: false });
-};
+
+
 
 module.exports.getDetails = async (id) => {
     try {
@@ -277,11 +286,11 @@ module.exports.updateImage = async (id, _image) => {
         });
 }
 
-module.exports.updateVerifyCode = async (id, veryfyCode) => {
+module.exports.updateVerifyCode = async (id, verifyCode) => {
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
         {
             $set: {
-                veryfyCode: updateVerifyCode
+                verifyCode: updateVerifyCode
             }
         });
 }

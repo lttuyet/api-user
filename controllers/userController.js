@@ -6,7 +6,6 @@ const mailer = require('../nodemailer');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 
-// -------------------get typical tutors------------------------
 exports.getTypicalTutors = async (req, res) => {
   try {
     const result = await userModel.getTypicalTutors();
@@ -50,9 +49,9 @@ exports.register = async (req, res) => {
 
   switch (req.body.type) {
     case 'normal': {
-      try{
+      try {
         isExisted = await userModel.findUserByTypeEmail(req.body.type, req.body.email);
-      }catch(e){
+      } catch (e) {
         return res.json({
           status: "failed",
           message: "Lỗi kết nối! Vui lòng thử lại!"
@@ -62,9 +61,9 @@ exports.register = async (req, res) => {
       break;
     }
     case 'facebook': {
-      try{
+      try {
         isExisted = await userModel.findUserByIdFb(req.body.idFb);
-      }catch(e){
+      } catch (e) {
         return res.json({
           status: "failed",
           message: "Lỗi kết nối! Vui lòng thử lại!"
@@ -74,9 +73,9 @@ exports.register = async (req, res) => {
       break;
     }
     case 'google': {
-      try{
+      try {
         isExisted = await userModel.findUserByIdGg(req.body.idGg);
-      }catch(e){
+      } catch (e) {
         return res.json({
           status: "failed",
           message: "Lỗi kết nối! Vui lòng thử lại!"
@@ -100,7 +99,7 @@ exports.register = async (req, res) => {
     await userModel.insertUser(req.body, req.body.type, secretToken);
 
     const newUser = await userModel.findUserByTypeEmail(req.body.type, req.body.email);
-    const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken +"</b><br>Truy cập trang này để xác thực đăng ký tài khoản:<a href='http://localhost:3000/activate&id="+ newUser._id+"'>http://localhost:3000/activate&id="+newUser._id+"</a>";
+    const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken + "</b><br>Truy cập trang này để xác thực đăng ký tài khoản:<a href='http://localhost:3000/activate&id=" + newUser._id + "'>http://localhost:3000/activate&id=" + newUser._id + "</a>";
 
     await mailer.sendMail(process.env.PORT, req.body.email, "[uber4tutor] Xác thực đăng ký tài khoản người dùng", html);
 
@@ -117,6 +116,74 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.checkStatus = async (req, res) => {
+  try {
+    const result = await userModel.findUserById(req.body.id);
+    
+    if (!result) {
+      return res.json({
+        status: "success",
+        message: "Tài khoản không tồn tại!",
+        codeMess:1
+      });
+    }
+
+    if (result.isblocked) {
+      return res.json({
+        status: "success",
+        email: result.email,
+        message: "Tài khoản đã bị khóa!",
+        codeMess:2
+      });
+    }
+
+    if (result.isActivated) {
+      return res.json({
+        status: "success",
+        email: result.email,
+        message: "Tài khoản đã được kích hoạt!",
+        codeMess:3
+      });
+    }
+    return res.json({
+      status: "success",
+      email: result.email,
+      message: "Tài khoản chưa được kích hoạt!",
+      codeMess:4
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Kết nối lỗi! Vui lòng thử lại!",
+      codeMess:0
+    });
+  }
+};
+
+
+
+exports.activatedCode = async (req, res) => {
+  try {
+    const result = await userModel.activatedCode(req.body);
+
+    if (result) {
+      return res.json({
+        status: "success",
+        message: "success"
+      });
+    }
+
+    return res.json({
+      status: "failed",
+      message: "Kết nối lỗi! Vui lòng thử lại!"
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Kết nối lỗi! Vui lòng thử lại!"
+    });
+  }
+};
 
 
 
@@ -313,19 +380,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.verify = async (req, res) => {
-  try {
-    return res.json({
-      status: "success",
-      message: "success"
-    });
-  } catch (e) {
-    return res.json({
-      status: "failed",
-      message: "forgot password failed"
-    });
-  }
-};
+
 
 exports.sendVerifyCode = async (req, res) => {
   try {

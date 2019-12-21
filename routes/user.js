@@ -12,6 +12,12 @@ router.get("/listtutors", userController.getListTutors);
 
 router.post("/register", userController.register);
 
+router.post("/checkstatus", userController.checkStatus);
+
+
+
+//router.post('/activatedcode', userController.activatedCode);
+
 
 
 
@@ -113,6 +119,6 @@ router.post('/forgotpassword', userController.forgotPassword);
 
 router.post('/sendactivatedcode', userController.sendVerifyCode);
 
-router.post('/activatedcode', userController.verify);
+//router.post('/activatedcode', userController.verify);
 
 module.exports = router;
