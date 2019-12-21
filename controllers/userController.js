@@ -4,7 +4,7 @@ const contractModel = require("../models/contracts");
 var randomstring = require("randomstring");
 const mailer = require('../nodemailer');
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
+const ObjectId = require('mongodb').ObjectId;
 
 exports.getTypicalTutors = async (req, res) => {
   try {
@@ -117,6 +117,14 @@ exports.register = async (req, res) => {
 };
 
 exports.checkStatus = async (req, res) => {
+  try{
+    const id=ObjectId(req.body.id);
+  }catch(e){
+    return res.json({
+      status: "failed",
+      message: "Tài khoản không tồn tại!"
+    });
+  }
   try {
     const result = await userModel.findUserById(req.body.id);
     
@@ -160,16 +168,53 @@ exports.checkStatus = async (req, res) => {
   }
 };
 
-
-
 exports.activatedCode = async (req, res) => {
+  try{
+    const id=ObjectId(req.body.id);
+  }catch(e){
+    return res.json({
+      status: "failed",
+      message: "Tài khoản không tồn tại!"
+    });
+  }
+
   try {
-    const result = await userModel.activatedCode(req.body);
+    const user=await userModel.findUserById(req.body.id);
+    
+
+    if(!user){
+      return res.json({
+        status: "failed",
+        message: "Tài khoản không tồn tại!"
+      });
+    }
+    if (user.isblocked) {
+      return res.json({
+        status: "failed",
+        message: "Tài khoản đã bị khóa!"
+      });
+    }
+
+    if (user.isActivated) {
+      return res.json({
+        status: "success",
+        message: "Tài khoản đã được kích hoạt!"
+      });
+    }
+
+    if(user.verifyCode!==req.body.code){
+      return res.json({
+        status: "failed",
+        message: "Sai mã xác thực!"
+      });
+    }
+
+    const result = await userModel.activatedCode(req.body.id);
 
     if (result) {
       return res.json({
         status: "success",
-        message: "success"
+        message: "Tài khoản đã được kích hoạt!"
       });
     }
 

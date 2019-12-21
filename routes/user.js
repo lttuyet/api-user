@@ -14,9 +14,7 @@ router.post("/register", userController.register);
 
 router.post("/checkstatus", userController.checkStatus);
 
-
-
-//router.post('/activatedcode', userController.activatedCode);
+router.post('/activatedcode', userController.activatedCode);
 
 
 

@@ -204,19 +204,14 @@ module.exports.findUserById = async (id) => {
     return await dbs.production.collection("users").findOne({ _id: ObjectId(id), isDeleted: false });
 };
 
-
-
-
-module.exports.activatedCode = async (data) => {
-    try {
-        const user = await dbs.production.collection("users").findOne({ _id: ObjectId(data.id) });
-
-        if (user.verifyCode === data.code) {
-            //const res
+module.exports.activatedCode = async (id) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
+    {
+        $set: {
+            isActivated:true,
+            activatedCode:''
         }
-    } catch (e) {
-        return false;
-    }
+    });
 };
 
 
