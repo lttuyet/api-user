@@ -16,14 +16,17 @@ router.post("/checkstatus", userController.checkStatus);
 
 router.post('/activatedcode', userController.activatedCode);
 
-
-
-
-
 router.post('/login', async (req, res, next) => {
     if (req.body.type === 'normal') {
         passport.authenticate('local', { session: false }, (err, user, info) => {
             if (info) {
+                if (info.message === "Tài khoản không tồn tại!") {
+                    return res.json({
+                        status: "failed",
+                        message: "Tài khoản không tồn tại!"
+                    });
+                }
+
                 if (info.message === "Tài khoản đã bị khóa!") {
                     return res.json({
                         status: "failed",
@@ -31,10 +34,10 @@ router.post('/login', async (req, res, next) => {
                     });
                 }
 
-                if (info.message === "Tài khoản không tồn tại!") {
+                if (info.message === "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!") {
                     return res.json({
                         status: "failed",
-                        message: "Tài khoản không tồn tại!"
+                        message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!"
                     });
                 }
             }
@@ -105,6 +108,16 @@ router.post('/login', async (req, res, next) => {
         });
     }
 });
+
+
+
+
+
+
+
+
+
+
 
 
 router.get("/listtags", tagController.getAll);

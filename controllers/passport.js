@@ -15,14 +15,14 @@ module.exports = function (passport) {
             return done(null, false, { message: "Tài khoản không tồn tại!" });
           }
 
-          if (!user.isActivated) {
-            return done(null, false, { message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!" });
-          }
-
           if (user.isblocked) {
             return done(null, false, { message: "Tài khoản đã bị khóa!" });
           }
 
+          if (!user.isActivated) {
+            return done(null, false, { message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!" });
+          }
+          
           // Match password
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) {
