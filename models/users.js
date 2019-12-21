@@ -7,7 +7,7 @@ const ObjectId = require('mongodb').ObjectId;
 module.exports.getTypicalTutors = async () => {
     // match dùng để lọc dữ liệu theo các trường
     const typicalTutors = await dbs.production.collection('users').aggregate([
-        { $match: { role: "tutor", isDeleted: false,isblocked:false,isActivated:true  } },
+        { $match: { role: "tutor", isDeleted: false, isblocked: false, isActivated: true } },
         {
             $lookup: {
                 from: 'contracts',
@@ -68,7 +68,7 @@ module.exports.getTypicalTutors = async () => {
 
 module.exports.getListTutors = async () => {
     const tutors = await dbs.production.collection('users').aggregate([
-        { $match: { role: "tutor", isDeleted: false,isblocked:false,isActivated:true } }, // match dùng để lọc dữ liệu theo các trường
+        { $match: { role: "tutor", isDeleted: false, isblocked: false, isActivated: true } }, // match dùng để lọc dữ liệu theo các trường
         {
             $lookup: {
                 from: 'contracts',
@@ -124,65 +124,30 @@ module.exports.getListTutors = async () => {
     return tutors;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// --------------------find---------------------------------
 module.exports.findUserByTypeEmail = async (_type, _email) => {
-    return await dbs.production.collection("users").findOne({
-        type: _type,
-        email: _email.toLowerCase(),
-        isDeleted: false
-    });
-};
-
-module.exports.findUserByEmail = async (_email) => {
-    return await dbs.production.collection("users").findOne({
-        email: _email.toLowerCase(),
-        isDeleted: false
-    });
-};
-
-module.exports.findUserByIdFb = async (_idFb) => {
-    return await dbs.production.collection("users").findOne({
-        idFb: _idFb,
-        isDeleted: false
-    });
-};
-
-module.exports.findUserByIdGg = async (_idGg) => {
-    return await dbs.production.collection("users").findOne({
-        idGg: _idGg,
-        isDeleted: false
-    });
-};
-
-module.exports.findUserById = async (id) => {
-    return await dbs.production.collection("users").findOne({ _id: ObjectId(id) ,isDeleted: false});
-};
-
-module.exports.getDetails = async (id) => {
     try {
-        return await dbs.production.collection('users').findOne({ _id: ObjectId(id),isDeleted: false,isblocked:false,isActivated:true  });
+        return await dbs.production.collection("users").findOne({
+            type: _type,
+            email: _email.toLowerCase(),
+            isDeleted: false
+        });
     } catch (e) {
         return false;
     }
 };
 
+module.exports.findUserByIdFb = async (_idFb) => {
+    try {
+        return await dbs.production.collection("users").findOne({
+            idFb: _idFb,
+            isDeleted: false
+        });
+    } catch (e) {
+        return false;
+    }
+};
 
-// ------------------------insert-------------------------------
-module.exports.insertUser = async (user, type,secretToken) => {
+module.exports.insertUser = async (user, type, secretToken) => {
     if (type === 'normal') {
         const hash = await bcrypt.hash(user.password, SALT_ROUNDS);
         const newUser = {
@@ -193,9 +158,9 @@ module.exports.insertUser = async (user, type,secretToken) => {
             email: user.email.toLowerCase(),
             password: hash,
             isDeleted: false,
-            isblocked:false,
-            isActivated:false,
-            veryfyCode:secretToken
+            isblocked: false,
+            isActivated: false,
+            veryfyCode: secretToken
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -210,9 +175,9 @@ module.exports.insertUser = async (user, type,secretToken) => {
             idFb: user.idFb,
             image: user.image,
             isDeleted: false,
-            isblocked:false,
-            isActivated:false,
-            veryfyCode:""
+            isblocked: false,
+            isActivated: false,
+            veryfyCode: ""
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -227,19 +192,64 @@ module.exports.insertUser = async (user, type,secretToken) => {
             idGg: user.idGg,
             image: user.image,
             isDeleted: false,
-            isblocked:false,
-            isActivated:false,
-            veryfyCode:""
+            isblocked: false,
+            isActivated: false,
+            veryfyCode: ""
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
     }
 };
 
+
+
+
+
+
+
+
+
+
+
+// --------------------find---------------------------------
+
+
+module.exports.findUserByEmail = async (_email) => {
+    return await dbs.production.collection("users").findOne({
+        email: _email.toLowerCase(),
+        isDeleted: false
+    });
+};
+
+
+
+module.exports.findUserByIdGg = async (_idGg) => {
+    return await dbs.production.collection("users").findOne({
+        idGg: _idGg,
+        isDeleted: false
+    });
+};
+
+module.exports.findUserById = async (id) => {
+    return await dbs.production.collection("users").findOne({ _id: ObjectId(id), isDeleted: false });
+};
+
+module.exports.getDetails = async (id) => {
+    try {
+        return await dbs.production.collection('users').findOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true });
+    } catch (e) {
+        return false;
+    }
+};
+
+
+// ------------------------insert-------------------------------
+
+
 // --------------------------update-------------------------------
 module.exports.updateInfoUser = async (user, info) => {
 
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(user._id),isDeleted: false,isblocked:false,isActivated:true  },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(user._id), isDeleted: false, isblocked: false, isActivated: true },
         {
             $set: {
                 name: info.name,
@@ -249,7 +259,7 @@ module.exports.updateInfoUser = async (user, info) => {
 }
 
 module.exports.updateBasic = async (id, data) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id),isDeleted: false,isblocked:false,isActivated:true  },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
         {
             $set: {
                 name: data.name,
@@ -259,7 +269,7 @@ module.exports.updateBasic = async (id, data) => {
 }
 
 module.exports.updateImage = async (id, _image) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id),isDeleted: false,isblocked:false,isActivated:true  },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
         {
             $set: {
                 image: _image
@@ -268,10 +278,10 @@ module.exports.updateImage = async (id, _image) => {
 }
 
 module.exports.updateVerifyCode = async (id, veryfyCode) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id),isDeleted: false,isblocked:false,isActivated:false },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
         {
             $set: {
-                veryfyCode:updateVerifyCode
+                veryfyCode: updateVerifyCode
             }
         });
 }
@@ -279,7 +289,7 @@ module.exports.updateVerifyCode = async (id, veryfyCode) => {
 
 
 module.exports.getDetailsTutor = async (id) => {
-    const tutor = await dbs.production.collection('users').findOne({ _id: ObjectId(id), role: "tutor", isDeleted: false,isblocked:false,isActivated:true });
+    const tutor = await dbs.production.collection('users').findOne({ _id: ObjectId(id), role: "tutor", isDeleted: false, isblocked: false, isActivated: true });
 
     return tutor;
 }

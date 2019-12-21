@@ -8,12 +8,13 @@ const passport = require('passport');
 // ------------------Chưa đăng nhập------------------------
 router.get("/typicaltutors", userController.getTypicalTutors);
 
-
-
-
-
+router.get("/listtutors", userController.getListTutors);
 
 router.post("/register", userController.register);
+
+
+
+
 
 router.post('/login', async (req, res, next) => {
     if (req.body.type === 'normal') {
@@ -101,7 +102,6 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get("/listtutors", userController.getListTutors);
 
 router.get("/listtags", tagController.getAll);
 
