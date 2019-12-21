@@ -239,29 +239,8 @@ exports.activatedCode = async (req, res) => {
 
 
 
-exports.loginByFacebook = async (info) => {
-  let _idFb = await userModel.findUserByIdFb(info.idFb);
 
-  if (_idFb) {
-    await userModel.updateInfoUser(_idFb, info);
 
-    return await userModel.findUserByIdFb(info.idFb);
-  }
-
-  return false;
-};
-
-exports.loginByGoogle = async (info) => {
-  let _email = await userModel.findUserByIdGg(info.idGg);
-
-  if (_email) {
-    await userModel.updateInfoUser(_email, info);
-
-    return await userModel.findUserByIdGg(info.idGg);
-  }
-
-  return false;
-};
 
 exports.getDetailsTutor = async (req, res) => {
   const _tutor = await userModel.getDetails(req.body.id);

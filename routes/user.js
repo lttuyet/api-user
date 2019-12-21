@@ -17,97 +17,138 @@ router.post("/checkstatus", userController.checkStatus);
 router.post('/activatedcode', userController.activatedCode);
 
 router.post('/login', async (req, res, next) => {
-    if (req.body.type === 'normal') {
-        passport.authenticate('local', { session: false }, (err, user, info) => {
-            if (info) {
-                if (info.message === "Tài khoản không tồn tại!") {
+    try{
+        if (req.body.type === 'normal') {
+            passport.authenticate('local', { session: false }, (err, user, info) => {
+                if (info) {
+                    if (info.message === "Tài khoản không tồn tại!") {
+                        return res.json({
+                            status: "failed",
+                            message: "Tài khoản không tồn tại!"
+                        });
+                    }
+    
+                    if (info.message === "Tài khoản đã bị khóa!") {
+                        return res.json({
+                            status: "failed",
+                            message: "Tài khoản đã bị khóa!"
+                        });
+                    }
+    
+                    if (info.message === "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!") {
+                        return res.json({
+                            status: "failed",
+                            message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!"
+                        });
+                    }
+                }
+    
+                if (err || !user) {
                     return res.json({
                         status: "failed",
-                        message: "Tài khoản không tồn tại!"
+                        message: "Lỗi kết nối"
                     });
                 }
-
-                if (info.message === "Tài khoản đã bị khóa!") {
+    
+                req.login(user, { session: false }, (err) => {
+                    if (err) {
+                        res.send(err);
+                    }
+    
+                    const token = jwt.sign(user, 'your_jwt_secret');
+    
+                    const data = {
+                        name: user.name,
+                        image: user.image,
+                        role: user.role
+                    }
                     return res.json({
-                        status: "failed",
-                        message: "Tài khoản đã bị khóa!"
+                        status: "success",
+                        data,
+                        token
                     });
-                }
-
-                if (info.message === "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!") {
-                    return res.json({
-                        status: "failed",
-                        message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!"
-                    });
-                }
-            }
-
-            if (err || !user) {
+                });
+            })(req, res, next);
+        }
+    
+        if (req.body.type === 'facebook') {
+            const user = await userModel.findUserByIdFb(info.idFb);
+    
+            if (!user) {
                 return res.json({
                     status: "failed",
-                    message: "Lỗi kết nối"
+                    message: "Tài khoản không tồn tại!"
                 });
             }
-
-            req.login(user, { session: false }, (err) => {
-                if (err) {
-                    res.send(err);
-                }
-
-                const token = jwt.sign(user, 'your_jwt_secret');
-
-                const data = {
-                    name: user.name,
-                    image: user.image,
-                    role: user.role
-                }
+    
+            if (user.isblocked) {
                 return res.json({
-                    status: "success",
-                    data,
-                    token
+                    status: "failed",
+                    message: "Tài khoản đã bị khóa!"
                 });
-            });
-        })(req, res, next);
-    }
-
-    if (req.body.type === 'facebook') {
-        const user = await userController.loginByFacebook(req.body);
-
-        if (user) {
+            }
+    
+            if (!user.isActivated) {
+                return res.json({
+                    status: "failed",
+                    message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!"
+                });
+            }
+    
+            await userModel.updateDefault(user, req.body);
+    
             const token = jwt.sign(user, 'your_jwt_secret');
-
+    
             return res.json({
                 status: "success",
                 token,
                 role: user.role
             });
         }
-
-        return res.json({
-            status: "failed",
-            message: "Tài khoản không tồn tại!"
-        });
-    }
-
-    if (req.body.type === 'google') {
-        const user = await userController.loginByGoogle(req.body);
-
-        if (user) {
+    
+        if (req.body.type === 'google') {
+            const user = await userModel.findUserByIdGg(info.idGg);
+    
+            if (!user) {
+                return res.json({
+                    status: "failed",
+                    message: "Tài khoản không tồn tại!"
+                });
+            }
+    
+            if (user.isblocked) {
+                return res.json({
+                    status: "failed",
+                    message: "Tài khoản đã bị khóa!"
+                });
+            }
+    
+            if (!user.isActivated) {
+                return res.json({
+                    status: "failed",
+                    message: "Tài khoản chưa kích hoạt! Vui lòng kiểm tra email!"
+                });
+            }
+    
+            await userModel.updateDefault(user, req.body);
+    
             const token = jwt.sign(user, 'your_jwt_secret');
-
+    
             return res.json({
                 status: "success",
                 token,
                 role: user.role
             });
         }
-
+    }catch(e){
         return res.json({
             status: "failed",
-            message: "Tài khoản không tồn tại!"
+            message:"Lỗi kết nối! Vui lòng thử lại!"
         });
-    }
+    }    
 });
+
+router.post('/email-forget-password', userController.sendVerifyCode);
 
 
 

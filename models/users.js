@@ -204,8 +204,19 @@ module.exports.findUserById = async (id) => {
     return await dbs.production.collection("users").findOne({ _id: ObjectId(id), isDeleted: false });
 };
 
+module.exports.updateDefault = async (user, info) => {
+
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(user._id), isDeleted: false, isblocked: false, isActivated: true },
+        {
+            $set: {
+                name: info.name,
+                image: info.image
+            }
+        });
+}
+
 module.exports.activatedCode = async (id) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
     {
         $set: {
             isActivated:true,
@@ -251,16 +262,7 @@ module.exports.getDetails = async (id) => {
 
 
 // --------------------------update-------------------------------
-module.exports.updateInfoUser = async (user, info) => {
 
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(user._id), isDeleted: false, isblocked: false, isActivated: true },
-        {
-            $set: {
-                name: info.name,
-                image: info.image
-            }
-        });
-}
 
 module.exports.updateBasic = async (id, data) => {
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
