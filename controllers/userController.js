@@ -30,6 +30,21 @@ exports.getTypicalTutors = async (req, res) => {
   }
 };
 
+exports.getListTutors = async (req, res) => {
+  const _tutors = await userModel.getListTutors();
+
+  if (!_tutors) {
+    return res.json({
+      status: "failed",
+      message: "get list tutors failed"
+    });
+  }
+
+  return res.json({
+    tutors: _tutors
+  });
+};
+
 
 
 
@@ -224,20 +239,7 @@ exports.updateImage = async (req, res) => {
   });
 };
 
-exports.getListTutors = async (req, res) => {
-  const _tutors = await userModel.getListTutors();
 
-  if (!_tutors) {
-    return res.json({
-      status: "failed",
-      message: "get list tutors failed"
-    });
-  }
-
-  return res.json({
-    tutors: _tutors
-  });
-};
 
 exports.getDetailsTutor = async (req, res) => {
   try {

@@ -66,6 +66,77 @@ module.exports.getTypicalTutors = async () => {
     return typicalTutors;
 }
 
+module.exports.getListTutors = async () => {
+    const tutors = await dbs.production.collection('users').aggregate([
+        { $match: { role: "tutor", isDeleted: false,isblocked:false,isActivated:true } }, // match dùng để lọc dữ liệu theo các trường
+        {
+            $lookup: {
+                from: 'contracts',
+                localField: '_id',
+                foreignField: 'tutor',
+                as: 'tutor_contracts'
+            }
+        }, // Lấy danh sách hợp đồng
+        {
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: { $size: "$tutor_contracts" }
+            }
+        }, // Tính số hợp đồng
+        {
+            $sort: { numOfContracts: -1 }
+        }, // Sắp xếp theo phổ biến // bỏ qua skip tutors
+        {
+            $lookup: {
+                from: 'user_tag',
+                localField: '_id',
+                foreignField: 'user',
+                as: 'tutorTag'
+            }
+        }, // Lấy danh sách mã tags
+        {
+            $lookup: {
+                from: 'tags',
+                localField: 'tutorTag.tag',
+                foreignField: '_id',
+                as: 'tags'
+            }
+        }, // Lấy danh sách tags
+        {
+            $project: {
+                _id: "$_id",
+                name: "$name",
+                image: "$image",
+                intro: "$intro",
+                price: "$price",
+                address: "$address",
+                numOfContracts: "$numOfContracts",
+                tags: "$tags.name"
+            }
+        } // Chọn trường
+    ]).toArray();
+
+    return tutors;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --------------------find---------------------------------
 module.exports.findUserByTypeEmail = async (_type, _email) => {
@@ -205,63 +276,7 @@ module.exports.updateVerifyCode = async (id, veryfyCode) => {
         });
 }
 
-module.exports.getListTutors = async () => {
-    const tutors = await dbs.production.collection('users').aggregate([
-        { $match: { role: "tutor", isDeleted: false,isblocked:false,isActivated:true } }, // match dùng để lọc dữ liệu theo các trường
-        {
-            $lookup: {
-                from: 'contracts',
-                localField: '_id',
-                foreignField: 'tutor',
-                as: 'tutor_contracts'
-            }
-        }, // Lấy danh sách hợp đồng
-        {
-            $project: {
-                _id: "$_id",
-                name: "$name",
-                image: "$image",
-                intro: "$intro",
-                price: "$price",
-                address: "$address",
-                numOfContracts: { $size: "$tutor_contracts" }
-            }
-        }, // Tính số hợp đồng
-        {
-            $sort: { numOfContracts: -1 }
-        }, // Sắp xếp theo phổ biến // bỏ qua skip tutors
-        {
-            $lookup: {
-                from: 'user_tag',
-                localField: '_id',
-                foreignField: 'user',
-                as: 'tutorTag'
-            }
-        }, // Lấy danh sách mã tags
-        {
-            $lookup: {
-                from: 'tags',
-                localField: 'tutorTag.tag',
-                foreignField: '_id',
-                as: 'tags'
-            }
-        }, // Lấy danh sách tags
-        {
-            $project: {
-                _id: "$_id",
-                name: "$name",
-                image: "$image",
-                intro: "$intro",
-                price: "$price",
-                address: "$address",
-                numOfContracts: "$numOfContracts",
-                tags: "$tags.name"
-            }
-        } // Chọn trường
-    ]).toArray();
 
-    return tutors;
-}
 
 module.exports.getDetailsTutor = async (id) => {
     const tutor = await dbs.production.collection('users').findOne({ _id: ObjectId(id), role: "tutor", isDeleted: false,isblocked:false,isActivated:true });
