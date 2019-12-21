@@ -1,19 +1,61 @@
 const userModel = require("../models/users");
 const userTagModel = require("../models/user_tag");
 const contractModel = require("../models/contracts");
+var randomstring = require("randomstring");
+const mailer = require('../nodemailer');
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+
+// -------------------get typical tutors------------------------
+exports.getTypicalTutors = async (req, res) => { 
+  try{
+    const result = await userModel.getTypicalTutors();
+
+    if (result) {
+      return res.json({
+        status:"success",
+        tutors: result
+      });
+    }
+
+    return res.json({
+      status: "failed",
+      message: "get typical details failed"
+    });
+  }catch(e){
+    return res.json({
+      status: "failed",
+      message: "get typical details failed"
+    });
+  }
+};
+
+
+
+
+
+
+
+
 
 exports.register = async (req, res) => {
   if (req.body.type === 'normal') {
     // Chỉ được sử dụng 1 email cho 1 tài khoản dù với role nào
     const existedUsers = await userModel.findUserByTypeEmail(req.body.type, req.body.email);
 
-    if (existedUsers) {
+    /* if (existedUsers) {
       return res.json({
         status: 500,
         message: "existed account"
       });
-    } else {
-      await userModel.insertUser(req.body, req.body.type);
+    } else */{
+      const secretToken = randomstring.generate(6);
+
+      await userModel.insertUser(req.body, req.body.type, secretToken);
+
+      const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken + "</b><br>Truy cập trang này để xác nhận:<a href='http://localhost:3000'>http://localhost:3000</a>";
+
+      await mailer.sendMail("webthuvien123@gmail.com", "lethituyet687@gmail.com", "[uber4tutor] Xác thực tài khoản", html);
 
       return res.json({
         message: "success"
@@ -30,7 +72,13 @@ exports.register = async (req, res) => {
         message: "existed account"
       });
     } else {
-      await userModel.insertUser(req.body, req.body.type);
+      const secretToken = randomstring.generate(6);
+
+      await userModel.insertUser(req.body, req.body.type, secretToken);
+
+      const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken + "</b><br>Truy cập trang này để xác nhận:<a href='http://localhost:3000'>http://localhost:3000</a>";
+
+      await mailer.sendMail(process.env.EMAIL, newCustomer.email, "[uber4tutor] Xác thực tài khoản", html);
 
       return res.json({
         message: "success"
@@ -47,7 +95,13 @@ exports.register = async (req, res) => {
         message: "existed account"
       });
     } else {
-      await userModel.insertUser(req.body, req.body.type);
+      const secretToken = randomstring.generate(6);
+
+      await userModel.insertUser(req.body, req.body.type, secretToken);
+
+      const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken + "</b><br>Truy cập trang này để xác nhận:<a href='http://localhost:3000'>http://localhost:3000</a>";
+
+      await mailer.sendMail(process.env.EMAIL, newCustomer.email, "[uber4tutor] Xác thực tài khoản", html);
 
       return res.json({
         message: "success"
@@ -170,21 +224,6 @@ exports.updateImage = async (req, res) => {
   });
 };
 
-exports.getTypicalTutors = async (req, res) => {
-  const result = await userModel.getTypicalTutors();
-
-  if (result) {
-    return res.json({
-      tutors: result
-    });
-  }
-
-  return res.json({
-    status: "failed",
-    message: "get typical details failed"
-  });
-};
-
 exports.getListTutors = async (req, res) => {
   const _tutors = await userModel.getListTutors();
 
@@ -212,7 +251,7 @@ exports.getDetailsTutor = async (req, res) => {
     }
 
     const tutor = {
-      _id:_tutor._id,
+      _id: _tutor._id,
       name: _tutor.name,
       image: _tutor.image,
       address: _tutor.address,
@@ -228,10 +267,91 @@ exports.getDetailsTutor = async (req, res) => {
       tags: _tags,
       contracts: _contracts
     });
-} catch (e) {
-  return res.json({
-    status: "failed",
-    message: "get details tutor failed"
-  });
-}
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "get details tutor failed"
+    });
+  }
 };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+  const user = await userModel.findUserByEmail(req.body.email);
+
+  if (!user) {
+    return res.json({
+      status: "failed",
+      message: "Tài khoản chưa đăng ký!"
+    });
+  }
+
+  if (user.isblocked) {
+    return res.json({
+      status: "failed",
+      message: "Tài khoản đã bị khóa!"
+    });
+  }
+
+  const verifyPassCode = randomstring.generate(6);
+
+  await userModel.updateVerifyCode(user._id,verifyPassCode);
+
+  const html = "Chào bạn,<br>Mã xác thực quên mật khẩu của bạn là:<br>Mã xác thực quên mật khẩu:<b>" + verifyPassCode + "</b><br>Truy cập trang này để đăng nhập:<a href='http://localhost:3000'>http://localhost:3000</a>";
+  await mailer.sendMail(process.env.EMAIL, user.email, "[uber4tutor] Xác thực quên mật khẩu", html);
+
+  
+    return res.json({
+      status: "success",
+      message: "success"
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Yêu cầu gửi mã xác thực quên mật khẩu thất bại!"
+    });
+  }
+};
+
+exports.verify = async (req, res) => {
+  try {
+    return res.json({
+      status: "success",
+      message: "success"
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "forgot password failed"
+    });
+  }
+};
+
+exports.sendVerifyCode = async (req, res) => {
+  try {
+    return res.json({
+      status: "success",
+      message: "success"
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "forgot password failed"
+    });
+  }
+};
+
+exports.sendForgotPassword = async (req, res) => {
+  try {
+    return res.json({
+      status: "success",
+      message: "success"
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "forgot password failed"
+    });
+  }
+};
+

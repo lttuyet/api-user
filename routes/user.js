@@ -6,6 +6,13 @@ var tagController = require("../controllers/tagControllers");
 const passport = require('passport');
 
 // ------------------Chưa đăng nhập------------------------
+router.get("/typicaltutors", userController.getTypicalTutors);
+
+
+
+
+
+
 router.post("/register", userController.register);
 
 router.post('/login', async (req, res, next) => {
@@ -94,12 +101,18 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get("/typicaltutors", userController.getTypicalTutors);
-
 router.get("/listtutors", userController.getListTutors);
 
 router.get("/listtags", tagController.getAll);
 
 router.post("/detailstutor", userController.getDetailsTutor);
+
+router.post('/sendforgotpassword', userController.sendForgotPassword);
+
+router.post('/forgotpassword', userController.forgotPassword);
+
+router.post('/sendactivatedcode', userController.sendVerifyCode);
+
+router.post('/activatedcode', userController.verify);
 
 module.exports = router;
