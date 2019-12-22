@@ -180,8 +180,7 @@ exports.activatedCode = async (req, res) => {
 
   try {
     const user=await userModel.findUserById(req.body.id);
-    
-
+  
     if(!user){
       return res.json({
         status: "failed",
@@ -223,6 +222,61 @@ exports.activatedCode = async (req, res) => {
       message: "Kết nối lỗi! Vui lòng thử lại!"
     });
   } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Kết nối lỗi! Vui lòng thử lại!"
+    });
+  }
+};
+
+exports.sendVerifyCode = async (req, res) => {
+  try{
+    const user=await userModel.findUserByTypeEmail('normal',req.body.email);
+
+    if(!user){
+      const fbUser=await userModel.findUserByTypeEmail('facebook',req.body.email);
+
+      if(fbUser){
+        return res.json({
+          status: "failed",
+          message: "Tài khoản đăng kí bằng facebook nên không thể thực hiện chức năng này!"
+        });
+      }
+
+      const ggUser=await userModel.findUserByTypeEmail('google',req.body.email);
+
+      if(ggUser){
+        return res.json({
+          status: "failed",
+          message: "Tài khoản đăng kí bằng google nên không thể thực hiện chức năng này!"
+        });
+      }
+
+      return res.json({
+        status: "failed",
+        message: "Tài khoản không tồn tại!"
+      });
+    }
+
+    if(!user.isActivated){
+      return res.json({
+        status: "failed",
+        message: "Tài khoản này chưa được kích hoạt! Vui lòng kiểm tra email!"
+      });
+    }
+
+    const secretToken = randomstring.generate(6);
+
+    const html = "Chào bạn,<br>Mã xác thực đăng ký tài khoản của bạn là:<br>Code:<b>" + secretToken + "</b><br>Truy cập trang này để xác thực đăng ký tài khoản:<a href='http://localhost:3000/verify&id=" + user._id + "'>http://localhost:3000/activate&id=" + user._id + "</a>";
+
+    await mailer.sendMail(process.env.PORT, req.body.email, "[uber4tutor] Xác thực quên mật khẩu tài khoản người dùng", html);
+
+    return res.json({
+      status: "success",
+      id: user._id,
+      message: "success"
+    });
+  }catch(e){
     return res.json({
       status: "failed",
       message: "Kết nối lỗi! Vui lòng thử lại!"
@@ -406,19 +460,6 @@ exports.forgotPassword = async (req, res) => {
 
 
 
-exports.sendVerifyCode = async (req, res) => {
-  try {
-    return res.json({
-      status: "success",
-      message: "success"
-    });
-  } catch (e) {
-    return res.json({
-      status: "failed",
-      message: "forgot password failed"
-    });
-  }
-};
 
 exports.sendForgotPassword = async (req, res) => {
   try {

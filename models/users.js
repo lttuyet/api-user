@@ -216,7 +216,7 @@ module.exports.updateDefault = async (user, info) => {
 }
 
 module.exports.activatedCode = async (id) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
     {
         $set: {
             isActivated:true,
