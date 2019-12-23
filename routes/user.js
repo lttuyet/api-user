@@ -150,6 +150,14 @@ router.post('/login', async (req, res, next) => {
 
 router.post('/email-forget-password', userController.sendVerifyCode);
 
+router.post('/verify', userController.verifyCode);
+
+
+
+
+
+router.post('/forget-password', userController.recoverPassword);
+
 
 
 

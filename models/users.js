@@ -176,7 +176,7 @@ module.exports.insertUser = async (user, type, secretToken) => {
             isDeleted: false,
             isblocked: false,
             isActivated: false,
-            verifyCode: ""
+            verifyCode: secretToken
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -193,7 +193,7 @@ module.exports.insertUser = async (user, type, secretToken) => {
             isDeleted: false,
             isblocked: false,
             isActivated: false,
-            verifyCode: ""
+            verifyCode: secretToken
         };
 
         return await dbs.production.collection("users").insertOne(newUser);
@@ -220,10 +220,20 @@ module.exports.activatedCode = async (id) => {
     {
         $set: {
             isActivated:true,
-            activatedCode:''
+            verifyCode:''
         }
     });
 };
+
+module.exports.sendForgotPassword = async (id,_verifyCode) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+    {
+        $set: {
+            verifyCode:_verifyCode
+        }
+    });
+};
+
 
 
 
