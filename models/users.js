@@ -217,27 +217,43 @@ module.exports.updateDefault = async (user, info) => {
 
 module.exports.activatedCode = async (id) => {
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
-    {
-        $set: {
-            isActivated:true,
-            verifyCode:''
-        }
-    });
+        {
+            $set: {
+                isActivated: true,
+                verifyCode: ''
+            }
+        });
 };
 
-module.exports.sendForgotPassword = async (id,_verifyCode) => {
+module.exports.sendForgotPassword = async (id, _verifyCode) => {
     return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
-    {
-        $set: {
-            verifyCode:_verifyCode
-        }
-    });
+        {
+            $set: {
+                verifyCode: _verifyCode
+            }
+        });
 };
 
+module.exports.resetVerify = async (id) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+        {
+            $set: {
+                verifyCode: ""
+            }
+        });
+};
 
+module.exports.recoverPassword = async (id, newPass) => {
+    const hash = await bcrypt.hash(newPass, SALT_ROUNDS);
 
-
-
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+        {
+            $set: {
+                password: hash,
+                verifyCode: ""
+            }
+        });
+};
 
 
 
