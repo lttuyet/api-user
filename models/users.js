@@ -264,6 +264,36 @@ module.exports.updateImage = async (id, _image) => {
         });
 }
 
+module.exports.getDetails = async (id) => {
+    try {
+        return await dbs.production.collection('users').findOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true });
+    } catch (e) {
+        return false;
+    }
+};
+
+module.exports.updateBasic = async (id, data) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+        {
+            $set: {
+                name: data.name,
+                address: data.address
+            }
+        });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // --------------------find---------------------------------
@@ -282,13 +312,7 @@ module.exports.findUserByEmail = async (_email) => {
 
 
 
-module.exports.getDetails = async (id) => {
-    try {
-        return await dbs.production.collection('users').findOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true });
-    } catch (e) {
-        return false;
-    }
-};
+
 
 
 // ------------------------insert-------------------------------
@@ -297,39 +321,11 @@ module.exports.getDetails = async (id) => {
 // --------------------------update-------------------------------
 
 
-module.exports.updateBasic = async (id, data) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
-        {
-            $set: {
-                name: data.name,
-                address: data.address
-            }
-        });
-}
-
-module.exports.updateImage = async (id, _image) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
-        {
-            $set: {
-                image: _image
-            }
-        });
-}
-
-module.exports.updateVerifyCode = async (id, verifyCode) => {
-    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: false },
-        {
-            $set: {
-                verifyCode: updateVerifyCode
-            }
-        });
-}
 
 
 
-module.exports.getDetailsTutor = async (id) => {
-    const tutor = await dbs.production.collection('users').findOne({ _id: ObjectId(id), role: "tutor", isDeleted: false, isblocked: false, isActivated: true });
 
-    return tutor;
-}
+
+
+
 

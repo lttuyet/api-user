@@ -8,4 +8,6 @@ router.get("/me", userController.getDetails);
 
 router.post("/updateimage", userController.updateImage);
 
+router.post("/updatebasic", userController.updateBasic);
+
 module.exports = router;
