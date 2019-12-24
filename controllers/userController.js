@@ -461,54 +461,65 @@ exports.getDetailsTutor = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
 exports.getDetails = async (req, res) => {
   try {
     const _user = req.user;
 
-    if (_user.role === 'tutor') {
-      const _tags = await userTagModel.findByUser(_user._id);
-
-      if (!_tags) {
-        return res.json({
-          status: 507,
-          message: "get details user failed"
-        });
-      }
-
+    if (!_user) {
       return res.json({
-        user: _user,
-        tags: _tags
-      });
-    } else {
-      if (!_user) {
-        return res.json({
-          status: 507,
-          message: "get details user failed"
-        });
-      }
-
-      return res.json({
-        user: _user
+        status: "failed",
+        message: "get details failed"
       });
     }
 
+    const _tags = await userTagModel.findByUser(_user._id);
+
+    const user = {
+      _id: _user._id,
+      name: _user.name,
+      image: _user.image,
+      address: _user.address,
+      intro: _user.intro,
+      price: _user.price,
+      tags:_tags
+    };
+
+    return res.json({
+      status: "success",
+      user:user
+    });
   } catch (e) {
     return res.json({
-      status: 507,
+      status: "failed",
       message: "get details user failed"
     });
   }
 };
+
+exports.updateImage = async (req, res) => {
+  const result = await userModel.updateImage(req.user._id, req.body.image);
+
+  if (result) {
+    return res.json({
+      status:"success",
+      message: "Cập nhật ảnh đại diện thành công!"
+    });
+  }
+
+  return res.json({
+    status: "failed",
+    message: "Cập nhật ảnh đại diện thất bại! Vui lòng thử lại!"
+  });
+};
+
+
+
+
+
+
+
+
+
 
 exports.updateBasic = async (req, res) => {
   const result = await userModel.updateBasic(req.user._id, req.body);
@@ -525,17 +536,3 @@ exports.updateBasic = async (req, res) => {
   });
 };
 
-exports.updateImage = async (req, res) => {
-  const result = await userModel.updateImage(req.user._id, req.body.image);
-
-  if (result) {
-    return res.json({
-      message: "success"
-    });
-  }
-
-  return res.json({
-    status: 510,
-    message: "update image failed"
-  });
-};

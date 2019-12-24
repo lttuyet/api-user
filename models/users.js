@@ -255,7 +255,14 @@ module.exports.recoverPassword = async (id, newPass) => {
         });
 };
 
-
+module.exports.updateImage = async (id, _image) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true },
+        {
+            $set: {
+                image: _image
+            }
+        });
+}
 
 
 
