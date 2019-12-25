@@ -10,4 +10,6 @@ router.post("/updateimage", userController.updateImage);
 
 router.post("/updatebasic", userController.updateBasic);
 
+router.post("/updatetutorinfo", userController.updateTutorInfo);
+
 module.exports = router;

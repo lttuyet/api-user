@@ -36,8 +36,19 @@ module.exports.getTypicalTutors = async () => {
         {
             $lookup: {
                 from: 'user_tag',
-                localField: '_id',
-                foreignField: 'user',
+                let: { user_id: "$_id" },
+                pipeline: [
+                    { $match:
+                       { $expr:
+                          { $and:
+                             [
+                               { $eq: [ "$user",  "$$user_id" ] },
+                               { $eq: [ "$isDeleted", false ] }
+                             ]
+                          }
+                       }
+                    }
+                 ],
                 as: 'tutorTag'
             }
         },
@@ -94,8 +105,19 @@ module.exports.getListTutors = async () => {
         {
             $lookup: {
                 from: 'user_tag',
-                localField: '_id',
-                foreignField: 'user',
+                let: { user_id: "$_id" },
+                pipeline: [
+                    { $match:
+                       { $expr:
+                          { $and:
+                             [
+                               { $eq: [ "$user",  "$$user_id" ] },
+                               { $eq: [ "$isDeleted", false ] }
+                             ]
+                          }
+                       }
+                    }
+                 ],
                 as: 'tutorTag'
             }
         }, // Lấy danh sách mã tags
@@ -281,6 +303,18 @@ module.exports.updateBasic = async (id, data) => {
             }
         });
 }
+
+module.exports.updateBasicTutor = async (id, _intro,_price) => {
+    return await dbs.production.collection('users').updateOne({ _id: ObjectId(id), isDeleted: false, isblocked: false, isActivated: true,role:"tutor" },
+        {
+            $set: {
+                intro: _intro,
+                price: _price
+            }
+        });
+}
+
+
 
 
 

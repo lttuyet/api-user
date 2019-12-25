@@ -481,7 +481,8 @@ exports.getDetails = async (req, res) => {
       address: _user.address,
       intro: _user.intro,
       price: _user.price,
-      tags: _tags
+      tags: _tags,
+      role:_user.role
     };
 
     return res.json({
@@ -526,5 +527,29 @@ exports.updateBasic = async (req, res) => {
     status: "failed",
     message: "Cập nhật thông tin cá nhân thất bại!"
   });
+};
+
+exports.updateTutorInfo = async (req, res) => {
+  try {
+    const updateBasicTutor = await userModel.updateBasicTutor(req.user._id, req.body.intro,req.body.price);
+    const updateTagTutor = await userTagModel.updateTagTutor(req.user._id, req.body.tags);
+
+    if (updateBasicTutor&&updateTagTutor) {
+      return res.json({
+        status: "success",
+        message: "success"
+      });
+    }
+
+    return res.json({
+      status: "failed",
+      message: "Cập nhật thông tin gia sư thất bại!"
+    });
+  } catch{
+    return res.json({
+      status: "failed",
+      message: "Cập nhật thông tin cá nhân thất bại!"
+    });
+  }
 };
 

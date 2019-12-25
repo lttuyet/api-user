@@ -6,8 +6,6 @@ module.exports.getAll = async () => {
   return await dbs.production.collection("tags").find({ isDeleted: false }).toArray();
 };
 
-
-
 const findById = async (id) => {
   try {
     const res = await dbs.production.collection('tags').findOne({ _id: ObjectId(id) });
