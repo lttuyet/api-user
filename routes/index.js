@@ -12,4 +12,6 @@ router.post("/updatebasic", userController.updateBasic);
 
 router.post("/updatetutorinfo", userController.updateTutorInfo);
 
+router.post("/changepass", userController.changePass);
+
 module.exports = router;

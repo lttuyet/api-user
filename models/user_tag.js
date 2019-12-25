@@ -27,24 +27,24 @@ module.exports.updateTagTutor = async (id, tags) => {
 
     await userTag.forEach((eUT) => {
       const exist = tags.findIndex((eT) => {
-        return(eUT.tag == eT._id&&id==eUT.user.toString());
+        return (eUT.tag == eT._id && id == eUT.user.toString());
       });
 
       if (exist === -1) {
-        dbs.production.collection('user_tag').updateOne({ _id: ObjectId(eUT._id)},
-            {
-              $set: {
-                isDeleted: true
-              }
-            });
+        dbs.production.collection('user_tag').updateOne({ _id: ObjectId(eUT._id) },
+          {
+            $set: {
+              isDeleted: true
+            }
+          });
       } else {
-        tags.splice(exist,1);
+        tags.splice(exist, 1);
       }
     });
 
     await tags.forEach((element) => {
       const exist = userTag.findIndex((e) => {
-        return(e.tag == element._id&&id==e.user.toString());
+        return (e.tag == element._id && id == e.user.toString());
       });
 
       if (exist === -1) {
@@ -57,7 +57,7 @@ module.exports.updateTagTutor = async (id, tags) => {
         dbs.production.collection("user_tag").insertOne(ut);
       } else {
         if (element.isDeleted) {
-          dbs.production.collection('user_tag').updateOne({ tag: ObjectId(element._id), user: ObjectId(id), isDeleted: false},
+          dbs.production.collection('user_tag').updateOne({ tag: ObjectId(element._id), user: ObjectId(id), isDeleted: false },
             {
               $set: {
                 isDeleted: false

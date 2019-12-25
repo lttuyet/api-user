@@ -6,6 +6,8 @@ const mailer = require('../nodemailer');
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const SALT_ROUNDS = 10;
 
 exports.getTypicalTutors = async (req, res) => {
   try {
@@ -482,7 +484,7 @@ exports.getDetails = async (req, res) => {
       intro: _user.intro,
       price: _user.price,
       tags: _tags,
-      role:_user.role
+      role: _user.role
     };
 
     return res.json({
@@ -531,10 +533,10 @@ exports.updateBasic = async (req, res) => {
 
 exports.updateTutorInfo = async (req, res) => {
   try {
-    const updateBasicTutor = await userModel.updateBasicTutor(req.user._id, req.body.intro,req.body.price);
+    const updateBasicTutor = await userModel.updateBasicTutor(req.user._id, req.body.intro, req.body.price);
     const updateTagTutor = await userTagModel.updateTagTutor(req.user._id, req.body.tags);
 
-    if (updateBasicTutor&&updateTagTutor) {
+    if (updateBasicTutor && updateTagTutor) {
       return res.json({
         status: "success",
         message: "success"
@@ -553,3 +555,29 @@ exports.updateTutorInfo = async (req, res) => {
   }
 };
 
+exports.changePass = async (req, res) => {
+  try {
+    const checkOldPass = await bcrypt.compare(req.body.oldPass, req.user.password.toString());
+
+    if (checkOldPass) {
+      const newHashPass = await bcrypt.hash(req.body.newPass, SALT_ROUNDS);
+
+      await userModel.changePass(req.user._id, newHashPass);
+
+      return res.json({
+        status: 'success',
+        message: 'Đổi mật khẩu thành công!'
+      });
+    } else {
+      return res.json({
+        status: "failed",
+        message: 'Mật khẩu hiện tại không đúng! Vui lòng thử lại!'
+      });
+    }
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Đổi mật khẩu thất bại! Vui lòng thử lại!"
+    });
+  }
+};
