@@ -14,4 +14,6 @@ router.post("/updatetutorinfo", userController.updateTutorInfo);
 
 router.post("/changepass", userController.changePass);
 
+router.post("/tutorcontract", userController.getTutorContracts);
+
 module.exports = router;

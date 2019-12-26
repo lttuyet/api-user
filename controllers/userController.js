@@ -581,3 +581,20 @@ exports.changePass = async (req, res) => {
     });
   }
 };
+
+exports.getTutorContracts = async (req, res) => {
+  try {
+    const _contracts = await contractModel.findByTutor(req.user._id);
+
+    return res.json({
+      status: "success",
+      contracts: _contracts
+    });
+  } catch (e) {
+    return res.json({
+      status: "failed",
+      message: "Lấy danh sách hợp đồng gia sư thất bại!"
+    });
+  }
+};
+
