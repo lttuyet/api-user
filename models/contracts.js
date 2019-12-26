@@ -36,4 +36,42 @@ const findByTutor = async (id) => {
     }
 
 };
+
+const findByATutor = async (id,_role) => {
+    try {
+        const contracts = await dbs.production.collection('contracts').aggregate([
+            { $match: { learner: ObjectId(id), isDeleted: false} }, // lấy contracts của tutor chưa bị xóa
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'tutor',
+                    foreignField: '_id',
+                    as: 'learnerInfo'
+                }
+            }, // lấy thông tin người học
+            {
+                $project: {
+                    _id: "$_id",
+                    learner: {
+                        name: "$learnerInfo.name",
+                        image: "$learnerInfo.image",
+                    },
+                    comment: "$comment",
+                    rate: "$rate",
+                    status: "$status",
+                    startDate: "$startDate",
+                    endDate: "$endDate",
+                    hours: "$hours"
+                }
+            } // Chọn trường
+        ]).toArray();
+
+        return contracts;
+    } catch (e) {
+        return [];
+    }
+
+};
+exports.findByATutor = findByATutor;
+
 exports.findByTutor = findByTutor;

@@ -584,7 +584,15 @@ exports.changePass = async (req, res) => {
 
 exports.getTutorContracts = async (req, res) => {
   try {
-    const _contracts = await contractModel.findByTutor(req.user._id);
+    let _contracts;
+    if(req.user.role==="learner"){
+    _contracts = await contractModel.findByATutor(req.user._id, req.user.role);
+    }else{
+      _contracts = await contractModel.findByTutor(req.user._id, req.user.role);
+
+    }
+
+    console.log(req.user);
 
     return res.json({
       status: "success",
